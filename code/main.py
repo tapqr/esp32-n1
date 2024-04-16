@@ -12,24 +12,25 @@ import ubluetooth
 led = Pin(2, Pin.OUT)
 irPin = Pin(23, Pin.IN)
 
-uri = 'http://192.168.8.13/v1/keyevent'
-setUri = 'http://192.168.8.13/v1/action'
+uri = 'http://192.168.8.13:8080/v1/keyevent'
+setUri = 'http://192.168.8.13:8080/v1/action'
+preKey = ''
 # _IRQ_SCAN_RESULT = const(5)
 # _IRQ_SCAN_DONE = const(6)
 
 keyMap = {
     "34_202": 19, #上
     "34_210": 20, #下
-    "34_153": 20, #左
-    "34_193": 20, #右
-    "34_149": 20, #返回
-    "34_128": 20, #音量加
-    "34_129": 20, #音量减
-    "34_136": 20, #主界面
-    "34_130": 20, #菜单
-    "34_206": 20, #确认键
-    "34_220": 20, #电源
-    "34_141": 20, #设置
+    "34_153": 21, #左
+    "34_193": 22, #右
+    "34_149": 4, #返回
+    "34_128": 24, #音量加
+    "34_129": 25, #音量减
+    "34_136": 3, #主界面
+    "34_130": 82, #菜单
+    "34_206": 23, #确认键
+    "34_220": 26, #电源
+    "34_141": 27, #设置
 }
 
 def do_connect():
@@ -43,25 +44,26 @@ def do_connect():
     print('network config:', wlan.ifconfig())
 
 def irCallback(data, addr, ctrl):
+    global preKey
     if data < 0:
         print('repeat code.')
+        doHttp(preKey)
     else:
-        key = '%s_%s'%(addr, data)
-        if key == '34_141':
+        print('Data {:02x} Addr {:04x}'.format(data, addr))
+        preKey = '%s_%s'%(addr, data)
+        if preKey == '34_141':
             openSetting()
         else:
-            if key == '34_220':
+            if preKey == '34_220':
                 # 模拟连接蓝牙，可以开机
                 connectBle()
-            doHttp(key)
-        # print('Data {:02x} Addr {:04x}'.format(data, addr))
+            doHttp(preKey)
 
 def doHttp(key):
     code = keyMap[key]
     if code is not None:
         post_data = ujson.dumps({"keycode": keyMap[key], "longclick": False})
-        res = requests.post(uri, headers = {'content-type': 'application/json'}, data = post_data)
-        print(res.text)
+        requests.post(uri, headers = {'content-type': 'application/json'}, data = post_data)
 
 def openSetting():
     post_data = ujson.dumps({"action":"setting"})
