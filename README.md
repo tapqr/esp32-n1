@@ -1,3 +1,20 @@
+### 移动机顶盒遥控器控制斐讯N1
+
+1. 硬件
+  - esp32开发板
+  - 1838 ir
+
+2. 开发环境
+  - micropython
+
+3. 固件刷写
+  - 从 micropython 官网下载ios 文件 [micropython](https://micropython.org/download/)
+  - 按照固件页面的说明给开发板刷入固件
+
+4. 上传代码
+  - 借助 micropython 的 mpremote 工具上传代码和调试
+
+
 ### 接口说明
 
 URL:http://N1的IP:8080/v1/keyevent  (发送按钮指令)
@@ -25,7 +42,8 @@ URL: http://N1的IP:8080/v1/action (打开设置界面)
 
 {"action":"setting"}
 
-## 红外数据  地址码-数据
+## 移动机顶盒红外遥控器部分数据
+地址码-数据
 - 上:34-202
 - 下:34-210
 - 左:34-153
